@@ -19,63 +19,80 @@ Flowforge turns process logic into something you can see and shape.
 - 🔗 **Pluggable Nodes** — Easily extend the library of workflow steps with your own actions or integrations.
 
 ---
+## 🧠 Built with the Agentic UI Generator
+
+Flowforge’s foundation was created using the  
+**[Telerik & Kendo UI Agentic UI Generator](https://www.telerik.com/kendo-angular-ui-develop/components/ai-tools/agentic-ui-generator/)** —  
+an AI-powered tool that scaffolds Angular components, layouts, and bindings directly from natural language prompts.
+
+Instead of manually writing imports, templates, or bindings, we described our layout in plain English:
+
+> “Create a responsive Workflow Composer layout with a sidebar, a main canvas for connecting nodes, and a right-hand panel for properties.”
+
+The generator produced the initial structure, component setup, and accessibility markup — all editable, human-readable Angular code.
+
+We then extended it with:
+- Custom drag-and-drop logic for workflow nodes  
+- SVG-based connection rendering  
+- A properties service for contextual node settings  
+
+This hybrid approach shows how developers can **stay in control** while letting AI accelerate repetitive UI setup.
+
+---
 
 ## 🧱 Architecture
 
+src/
+├─ app/
+│ ├─ sidebar/ # draggable workflow steps
+│ ├─ canvas/ # main canvas area for building flows
+│ ├─ properties-panel/ # configure selected node
+│ ├─ toolbar/ # undo / redo / save controls
+│ └─ core/ # shared services, models, utils
+├─ assets/
+└─ styles/
 
 
-## Development server
+## Built with:
+- Angular v20+  
+- Kendo UI for Angular Components  
+- TypeScript, RxJS, and HTML Canvas /SVG for node connections  
 
-To start a local development server, run:
+---
 
-```bash
+## 🧑‍💻 Getting Started
+
+### 1. Install dependencies
+npm install
+
+### 2. Run the app
 ng serve
-```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+### 3. Open in browser
+http://localhost:4200
 
-## Code scaffolding
+### 💡 Example Workflow
+- Drag Send Email from the sidebar onto the canvas.
+- Connect it to Upload File and Post to Slack nodes.
+- Adjust properties in the right panel (recipient, file path, message).
+- Click Save Flow to persist your automation.
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## 🧭 Roadmap
+- Node grouping and zooming
+- Import/export of flows (JSON format)
+- Additional built-in actions (HTTP Request, Delay, Condition)
+- Keyboard navigation for canvas
+- Execution engine prototype
 
-```bash
-ng generate component component-name
-```
+## 🧩 Contributing
+- Fork the repo
+- Create a feature branch: git checkout -b feat/new-node
+- Commit your changes: git commit -m "Add new workflow node type"
+- Push and open a Pull Request
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## 🪄 About
+Flowforge was created as part of the Telerik & Kendo UI MCP Tools showcase.
+It demonstrates how AI-assisted UI generation can accelerate front-end development—turning ideas into working interfaces in seconds.
 
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+### License
+- MIT © 2025 Progress Software – Demo Application
