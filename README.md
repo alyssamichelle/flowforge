@@ -1,6 +1,28 @@
-# Flowforge
+# Flowforge ⚙️
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.9.
+
+
+**Flowforge** is a visual workflow composer built with Angular and Kendo UI.  
+It lets you drag, connect, and configure actions—like “Send Email” or “Post to Slack”—to design end-to-end automation flows with accessibility and style baked in.
+
+---
+
+## 🚀 Overview
+
+Flowforge turns process logic into something you can see and shape.
+
+- 🎨 **Visual Layout** — Sidebar of draggable nodes, central canvas for connections, and a properties panel for configuration.  
+- 🧠 **Smart UI Generation** — Built using the Telerik & Kendo UI MCP Tools (AI UI Generator).  
+- ♿ **Accessible by Default** — Semantic structure, visible focus indicators, and WCAG-compliant contrast.  
+- 🌗 **Theme-Aware** — Light and dark mode support out of the box.  
+- 🔗 **Pluggable Nodes** — Easily extend the library of workflow steps with your own actions or integrations.
+
+---
+
+## 🧱 Architecture
+
+
 
 ## Development server
 
