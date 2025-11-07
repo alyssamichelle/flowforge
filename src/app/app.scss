@@ -1,0 +1,436 @@
+// Workflow Composer Application Styles
+
+:host {
+  display: block;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.workflow-composer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: var(--kendo-color-surface, #f5f5f5);
+}
+
+// Header Styles
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background-color: var(--kendo-color-primary, #0078d4);
+  color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+
+  .app-title {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  .app-actions {
+    display: flex;
+    gap: 0.75rem;
+  }
+}
+
+// Main Splitter Layout
+.workflow-splitter {
+  flex: 1;
+  height: calc(100vh - 64px);
+  overflow: hidden;
+}
+
+// Common Panel Styles
+.sidebar-panel,
+.canvas-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: white;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--kendo-color-border, #e0e0e0);
+  background-color: var(--kendo-color-surface-alt, #fafafa);
+
+  h2 {
+    margin: 0;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--kendo-color-on-app-surface, #424242);
+  }
+}
+
+.panel-content {
+  flex: 1;
+  padding: 1rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--kendo-color-surface-alt, #f5f5f5);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--kendo-color-border, #c0c0c0);
+    border-radius: 4px;
+
+    &:hover {
+      background: var(--kendo-color-border-alt, #a0a0a0);
+    }
+  }
+}
+
+// Left Panel: Workflow Steps
+.left-panel {
+  .drag-wrapper {
+    margin-bottom: 0.75rem;
+    cursor: grab;
+    border-radius: 6px;
+    
+    // Visible focus outline for accessibility
+    &:focus {
+      outline: 2px solid var(--kendo-color-primary, #0078d4);
+      outline-offset: 2px;
+    }
+
+    &:focus-visible {
+      outline: 3px solid var(--kendo-color-primary, #0078d4);
+      outline-offset: 3px;
+      box-shadow: 0 0 0 4px rgba(0, 120, 212, 0.2);
+    }
+
+    &:active {
+      cursor: grabbing;
+      
+      .step-card {
+        transform: translateY(0);
+        opacity: 0.7;
+      }
+    }
+  }
+
+  .step-card {
+    transition: all 0.2s ease;
+    border: 1px solid var(--kendo-color-border, #e0e0e0);
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+      border-color: var(--kendo-color-primary, #0078d4);
+    }
+
+    .step-card-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+
+      .step-icon {
+        font-size: 1.5rem;
+        line-height: 1;
+        color: var(--kendo-color-primary, #0078d4);
+        flex-shrink: 0;
+        
+        // Ensure SVG icons are properly sized
+        ::ng-deep svg {
+          width: 24px;
+          height: 24px;
+        }
+      }
+
+      h3 {
+        margin: 0;
+        font-size: 0.9375rem;
+        font-weight: 600;
+        color: var(--kendo-color-on-app-surface, #424242);
+      }
+    }
+
+    .step-description {
+      margin: 0;
+      font-size: 0.8125rem;
+      color: var(--kendo-color-subtle, #757575);
+      line-height: 1.4;
+    }
+  }
+}
+
+
+// Center Panel: Canvas
+.canvas-panel {
+  .canvas-controls {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .canvas-content {
+    background: 
+      linear-gradient(90deg, var(--kendo-color-border, #e8e8e8) 1px, transparent 1px),
+      linear-gradient(var(--kendo-color-border, #e8e8e8) 1px, transparent 1px);
+    background-size: 20px 20px;
+    background-position: -1px -1px;
+    position: relative;
+    transition: background-color 0.2s ease;
+    min-height: 400px; // Ensure minimum height for drop target
+
+    &.drag-over {
+      background-color: rgba(0, 120, 212, 0.05);
+      
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        border: 2px dashed var(--kendo-color-primary, #0078d4);
+        pointer-events: none;
+        animation: pulse 1.5s ease-in-out infinite;
+        z-index: 1;
+      }
+    }
+  }
+
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 0.5;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  .canvas-placeholder {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: var(--kendo-color-subtle, #9e9e9e);
+    pointer-events: none; // Ensure placeholder doesn't block drops
+    z-index: 0;
+
+    .placeholder-icon {
+      opacity: 0.3;
+      margin-bottom: 1rem;
+    }
+
+    .placeholder-text {
+      margin: 0;
+      font-size: 1rem;
+      max-width: 300px;
+    }
+  }
+
+  .canvas-step {
+    position: absolute;
+    min-width: 150px;
+    background: white;
+    border: 2px solid var(--kendo-color-border, #e0e0e0);
+    border-radius: 8px;
+    padding: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+    // Visible focus outline for accessibility
+    &:focus {
+      outline: 2px solid var(--kendo-color-primary, #0078d4);
+      outline-offset: 2px;
+    }
+
+    &:focus-visible {
+      outline: 3px solid var(--kendo-color-primary, #0078d4);
+      outline-offset: 3px;
+      box-shadow: 0 0 0 4px rgba(0, 120, 212, 0.2);
+    }
+
+    &:hover {
+      border-color: var(--kendo-color-primary, #0078d4);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+      z-index: 10;
+    }
+
+    &.selected {
+      border-color: var(--kendo-color-primary, #0078d4);
+      background-color: rgba(0, 120, 212, 0.05);
+      box-shadow: 0 4px 12px rgba(0, 120, 212, 0.3);
+      z-index: 20;
+    }
+
+    .canvas-step-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      .canvas-step-icon {
+        font-size: 1.25rem;
+        line-height: 1;
+        color: var(--kendo-color-primary, #0078d4);
+        flex-shrink: 0;
+
+        // Ensure SVG icons are properly sized
+        ::ng-deep svg {
+          width: 20px;
+          height: 20px;
+        }
+      }
+
+      .canvas-step-name {
+        flex: 1;
+        font-weight: 600;
+        font-size: 0.875rem;
+        color: var(--kendo-color-on-app-surface, #424242);
+      }
+
+      .remove-btn {
+        opacity: 0;
+        transition: opacity 0.2s ease;
+      }
+    }
+
+    &:hover .remove-btn,
+    &.selected .remove-btn,
+    &:focus .remove-btn,
+    &:focus-within .remove-btn {
+      opacity: 1;
+    }
+  }
+}
+
+// Right Panel: Properties
+.right-panel {
+  .properties-card {
+    height: auto;
+  }
+
+  .property-group {
+    margin-bottom: 1.25rem;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    .property-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--kendo-color-on-app-surface, #424242);
+    }
+
+    .k-input,
+    .k-textarea {
+      width: 100%;
+      font-size: 0.875rem;
+    }
+  }
+
+  .empty-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+    text-align: center;
+    color: var(--kendo-color-subtle, #9e9e9e);
+
+    p {
+      margin: 0;
+      font-size: 0.9375rem;
+    }
+  }
+}
+
+// Responsive Styles
+@media (max-width: 1024px) {
+  .workflow-splitter {
+    .sidebar-panel {
+      .panel-content {
+        padding: 0.75rem;
+      }
+    }
+  }
+
+  .step-card {
+    margin-bottom: 0.5rem !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .app-header {
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+
+    .app-title {
+      font-size: 1.25rem;
+    }
+
+    .app-actions {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  .panel-header {
+    padding: 0.75rem 1rem;
+
+    h2 {
+      font-size: 1rem;
+    }
+  }
+}
+
+// Kendo Splitter Customization
+::ng-deep {
+  .k-splitter {
+    border: none;
+  }
+
+  .k-splitter-bar {
+    background-color: var(--kendo-color-border, #e0e0e0);
+    
+    &:hover {
+      background-color: var(--kendo-color-primary, #0078d4);
+    }
+  }
+
+  .k-splitbar-draggable-horizontal {
+    cursor: col-resize;
+  }
+
+  .k-splitbar-draggable-vertical {
+    cursor: row-resize;
+  }
+
+  // Card customization
+  .k-card {
+    border-radius: 6px;
+  }
+
+  .k-card-header {
+    padding: 0.875rem 1rem;
+  }
+
+  .k-card-body {
+    padding: 1rem;
+  }
+
+  .k-card-actions {
+    padding: 0.75rem 1rem;
+    border-top: 1px solid var(--kendo-color-border, #e0e0e0);
+    background-color: var(--kendo-color-surface-alt, #fafafa);
+  }
+}
