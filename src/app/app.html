@@ -1,12 +1,46 @@
 <!-- Workflow Composer Application -->
 <div class="workflow-composer">
+  <!-- Toolbar -->
+  <kendo-toolbar class="app-toolbar">
+    <kendo-toolbar-button
+      [svgIcon]="undoIcon"
+      [text]="'Undo'"
+      [title]="'Undo (Ctrl+Z)'"
+      [disabled]="!canUndoSignal()"
+      (click)="undo()"
+      [attr.aria-label]="'Undo last action. Keyboard shortcut: Control Z'"
+      [attr.aria-keyshortcuts]="'Control+Z'"
+    >
+    </kendo-toolbar-button>
+    
+    <kendo-toolbar-button
+      [svgIcon]="redoIcon"
+      [text]="'Redo'"
+      [title]="'Redo (Ctrl+Y)'"
+      [disabled]="!canRedoSignal()"
+      (click)="redo()"
+      [attr.aria-label]="'Redo last undone action. Keyboard shortcut: Control Y'"
+      [attr.aria-keyshortcuts]="'Control+Y'"
+    >
+    </kendo-toolbar-button>
+
+    <kendo-toolbar-separator></kendo-toolbar-separator>
+    
+    <kendo-toolbar-button
+      [svgIcon]="saveIcon"
+      [text]="'Save Flow'"
+      [title]="'Save Flow (Ctrl+S)'"
+      [themeColor]="'primary'"
+      (click)="saveFlow()"
+      [attr.aria-label]="'Save workflow to file. Keyboard shortcut: Control S'"
+      [attr.aria-keyshortcuts]="'Control+S'"
+    >
+    </kendo-toolbar-button>
+  </kendo-toolbar>
+
   <!-- Header -->
   <header class="app-header">
     <h1 class="app-title">{{ title() }}</h1>
-    <div class="app-actions">
-      <button kendoButton [themeColor]="'primary'">Save Workflow</button>
-      <button kendoButton>Run</button>
-    </div>
   </header>
 
   <!-- Main Layout with Splitter -->
@@ -72,6 +106,38 @@
             <button kendoButton [icon]="'reset'" [fillMode]="'flat'"></button>
           </div>
         </div>
+
+        <!-- Keyboard Shortcuts Legend -->
+        <div class="keyboard-shortcuts-panel">
+          <div class="shortcuts-header">
+            <span class="shortcuts-title">⌨️ Keyboard Shortcuts</span>
+          </div>
+          <div class="shortcuts-grid">
+            <div class="shortcut-item">
+              <kbd class="kbd-key">Ctrl</kbd>
+              <span class="kbd-plus">+</span>
+              <kbd class="kbd-key">Z</kbd>
+              <span class="shortcut-description">Undo</span>
+            </div>
+            <div class="shortcut-item">
+              <kbd class="kbd-key">Ctrl</kbd>
+              <span class="kbd-plus">+</span>
+              <kbd class="kbd-key">Y</kbd>
+              <span class="shortcut-description">Redo</span>
+            </div>
+            <div class="shortcut-item">
+              <kbd class="kbd-key">Ctrl</kbd>
+              <span class="kbd-plus">+</span>
+              <kbd class="kbd-key">S</kbd>
+              <span class="shortcut-description">Save Flow</span>
+            </div>
+            <div class="shortcut-item">
+              <kbd class="kbd-key">Del</kbd>
+              <span class="shortcut-description">Delete Selected</span>
+            </div>
+          </div>
+        </div>
+
         <div 
           class="panel-content canvas-content"
           kendoDropTarget

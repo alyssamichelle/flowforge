@@ -13,12 +13,20 @@
   background-color: var(--kendo-color-surface, #f5f5f5);
 }
 
+// Toolbar Styles
+.app-toolbar {
+  border-bottom: 1px solid var(--kendo-color-border, #e0e0e0);
+  background-color: var(--kendo-color-surface, #ffffff);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  z-index: 101;
+}
+
 // Header Styles
 .app-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 1.5rem;
+  padding: 0.75rem 1.5rem;
   background-color: var(--kendo-color-primary, #0078d4);
   color: white;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -26,21 +34,16 @@
 
   .app-title {
     margin: 0;
-    font-size: 1.5rem;
+    font-size: 1.375rem;
     font-weight: 600;
     letter-spacing: -0.02em;
-  }
-
-  .app-actions {
-    display: flex;
-    gap: 0.75rem;
   }
 }
 
 // Main Splitter Layout
 .workflow-splitter {
   flex: 1;
-  height: calc(100vh - 64px);
+  height: calc(100vh - 120px); // Adjusted for toolbar + header
   overflow: hidden;
 }
 
@@ -173,6 +176,82 @@
   .canvas-controls {
     display: flex;
     gap: 0.5rem;
+  }
+
+  // Keyboard Shortcuts Panel
+  .keyboard-shortcuts-panel {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border: 1px solid var(--kendo-color-border, #e0e0e0);
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    margin: 0.75rem 1rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    transition: all 0.2s ease;
+
+    &:hover {
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+    }
+
+    .shortcuts-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 0.5rem;
+
+      .shortcuts-title {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--kendo-color-on-app-surface, #424242);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+    }
+
+    .shortcuts-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .shortcut-item {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      font-size: 0.8125rem;
+
+      .kbd-key {
+        display: inline-block;
+        padding: 0.125rem 0.375rem;
+        font-family: 'SF Mono', 'Monaco', 'Consolas', 'Courier New', monospace;
+        font-size: 0.75rem;
+        font-weight: 600;
+        line-height: 1.2;
+        color: #2c3e50;
+        background: linear-gradient(180deg, #ffffff 0%, #f0f0f0 100%);
+        border: 1px solid #bdc3c7;
+        border-radius: 3px;
+        box-shadow: 
+          0 1px 0 rgba(0, 0, 0, 0.1),
+          inset 0 1px 0 rgba(255, 255, 255, 0.8);
+        text-align: center;
+        min-width: 24px;
+        transition: transform 0.1s ease;
+      }
+
+      .kbd-plus {
+        color: var(--kendo-color-subtle, #757575);
+        font-size: 0.75rem;
+        font-weight: 500;
+        margin: 0 0.125rem;
+      }
+
+      .shortcut-description {
+        color: var(--kendo-color-on-app-surface, #424242);
+        margin-left: 0.375rem;
+        font-weight: 500;
+      }
+    }
   }
 
   .canvas-content {

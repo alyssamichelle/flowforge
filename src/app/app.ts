@@ -1,10 +1,19 @@
-import { Component, ChangeDetectionStrategy, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal, HostListener } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { KENDO_LAYOUT } from '@progress/kendo-angular-layout';
 import { KENDO_BUTTONS } from '@progress/kendo-angular-buttons';
+import { KENDO_TOOLBAR } from '@progress/kendo-angular-toolbar';
 import { KENDO_DRAGANDDROP, DragTargetDragEvent, DragTargetDragEndEvent, DragTargetDragStartEvent } from '@progress/kendo-angular-utils';
 import { KENDO_ICONS } from '@progress/kendo-angular-icons';
-import { SVGIcon, envelopIcon, uploadIcon, commentIcon } from '@progress/kendo-svg-icons';
+import { 
+  SVGIcon, 
+  envelopIcon, 
+  uploadIcon, 
+  commentIcon,
+  undoIcon,
+  redoIcon,
+  saveIcon
+} from '@progress/kendo-svg-icons';
 
 interface WorkflowStep {
   id: number;
@@ -28,12 +37,17 @@ interface Connection {
 
 @Component({
   selector: 'app-root',
-  imports: [KENDO_LAYOUT, KENDO_BUTTONS, KENDO_DRAGANDDROP, KENDO_ICONS],
+  imports: [KENDO_LAYOUT, KENDO_BUTTONS, KENDO_TOOLBAR, KENDO_DRAGANDDROP, KENDO_ICONS],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
 export class App {
   protected readonly title = signal('FlowForge');
+  
+  // Icon references for toolbar
+  protected readonly undoIcon = undoIcon;
+  protected readonly redoIcon = redoIcon;
+  protected readonly saveIcon = saveIcon;
   
   protected readonly availableSteps = signal<WorkflowStep[]>([
     {
@@ -107,6 +121,17 @@ export class App {
   protected readonly connectingFrom = signal<CanvasStep | null>(null);
   protected readonly hoveredStep = signal<CanvasStep | null>(null);
 
+  // History management for undo/redo
+  private history: Array<{ canvasSteps: CanvasStep[], connections: Connection[] }> = [];
+  private historyIndex = -1;
+  protected readonly canUndoSignal = signal(false);
+  protected readonly canRedoSignal = signal(false);
+
+  constructor() {
+    // Initialize history with the initial state
+    this.saveState();
+  }
+
   protected getDragData(step: WorkflowStep) {
     return () => {
       console.log('getDragData called for step:', step.name);
@@ -174,6 +199,7 @@ export class App {
     if (this.selectedStep()?.id === step.id) {
       this.selectedStep.set(null);
     }
+    this.saveState(); // Save state after removing step
   }
 
   protected startConnection(step: CanvasStep, event: Event): void {
@@ -242,6 +268,7 @@ export class App {
   protected deleteConnection(connection: Connection, event: Event): void {
     event.stopPropagation();
     this.connections.update(conns => conns.filter(c => c.id !== connection.id));
+    this.saveState(); // Save state after deleting connection
   }
 
   // Canvas step drag handlers for repositioning
@@ -297,6 +324,104 @@ export class App {
     console.log('Canvas step drag ended', event);
     this.draggedStepId.set(null);
     this.dragStartPosition.set(null);
+    this.saveState(); // Save state after dragging
+  }
+
+  // History management methods
+  private saveState(): void {
+    // Remove any states after current index (for redo functionality)
+    this.history = this.history.slice(0, this.historyIndex + 1);
+    
+    // Save current state
+    this.history.push({
+      canvasSteps: JSON.parse(JSON.stringify(this.canvasSteps())),
+      connections: JSON.parse(JSON.stringify(this.connections()))
+    });
+    
+    this.historyIndex++;
+    this.updateHistoryButtons();
+    console.log('State saved. History index:', this.historyIndex);
+  }
+
+  private updateHistoryButtons(): void {
+    this.canUndoSignal.set(this.historyIndex > 0);
+    this.canRedoSignal.set(this.historyIndex < this.history.length - 1);
+  }
+
+  protected undo(): void {
+    if (this.historyIndex > 0) {
+      this.historyIndex--;
+      const state = this.history[this.historyIndex];
+      this.canvasSteps.set(JSON.parse(JSON.stringify(state.canvasSteps)));
+      this.connections.set(JSON.parse(JSON.stringify(state.connections)));
+      this.updateHistoryButtons();
+      console.log('Undo performed. History index:', this.historyIndex);
+    }
+  }
+
+  protected redo(): void {
+    if (this.historyIndex < this.history.length - 1) {
+      this.historyIndex++;
+      const state = this.history[this.historyIndex];
+      this.canvasSteps.set(JSON.parse(JSON.stringify(state.canvasSteps)));
+      this.connections.set(JSON.parse(JSON.stringify(state.connections)));
+      this.updateHistoryButtons();
+      console.log('Redo performed. History index:', this.historyIndex);
+    }
+  }
+
+  protected saveFlow(): void {
+    const workflow = {
+      steps: this.canvasSteps(),
+      connections: this.connections(),
+      savedAt: new Date().toISOString()
+    };
+    
+    console.log('Saving workflow:', workflow);
+    
+    // Convert to JSON and create download
+    const dataStr = JSON.stringify(workflow, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `workflow-${Date.now()}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+    
+    alert('Workflow saved successfully!');
+  }
+
+  // Keyboard shortcuts
+  @HostListener('window:keydown', ['$event'])
+  handleKeyboardEvent(event: KeyboardEvent): void {
+    // Ctrl+Z or Cmd+Z for Undo
+    if ((event.ctrlKey || event.metaKey) && event.key === 'z' && !event.shiftKey) {
+      event.preventDefault();
+      this.undo();
+    }
+    
+    // Ctrl+Y or Cmd+Y or Ctrl+Shift+Z for Redo
+    if ((event.ctrlKey || event.metaKey) && (event.key === 'y' || (event.key === 'z' && event.shiftKey))) {
+      event.preventDefault();
+      this.redo();
+    }
+    
+    // Ctrl+S or Cmd+S for Save
+    if ((event.ctrlKey || event.metaKey) && event.key === 's') {
+      event.preventDefault();
+      this.saveFlow();
+    }
+
+    // Delete or Backspace for removing selected step
+    if ((event.key === 'Delete' || event.key === 'Backspace') && this.selectedStep()) {
+      event.preventDefault();
+      const step = this.selectedStep() as CanvasStep;
+      if (step) {
+        this.removeCanvasStep(step);
+        console.log('Deleted step via keyboard:', step.name);
+      }
+    }
   }
 }
 
