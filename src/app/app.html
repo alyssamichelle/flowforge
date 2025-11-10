@@ -75,11 +75,63 @@
         <div 
           class="panel-content canvas-content"
           kendoDropTarget
+          kendoDragTargetContainer
+          [dragTargetFilter]="'.canvas-step'"
+          [dragHandle]="'.canvas-step-name'"
+          [mode]="'manual'"
           (enter)="onDragEnter()"
           (leave)="onDragLeave()"
           (drop)="onDrop($event)"
+          (onDragStart)="onCanvasStepDragStart($event)"
+          (onDrag)="onCanvasStepDrag($event)"
+          (onDragEnd)="onCanvasStepDragEnd($event)"
+          (click)="cancelConnection()"
           [class.drag-over]="isDraggingOver()"
+          [class.connecting-mode]="connectingFrom()"
         >
+          <!-- SVG layer for connections -->
+          <svg class="connections-layer" aria-hidden="true">
+            <defs>
+              <!-- Arrow marker for connection lines -->
+              <marker
+                id="arrowhead"
+                markerWidth="10"
+                markerHeight="10"
+                refX="9"
+                refY="3"
+                orient="auto"
+              >
+                <polygon points="0 0, 10 3, 0 6" fill="var(--kendo-color-primary, #0078d4)" />
+              </marker>
+            </defs>
+            
+            <!-- Draw connection lines -->
+            @for (connection of connections(); track connection.id) {
+              <g class="connection-group">
+                <path
+                  [attr.d]="getConnectionPath(connection)"
+                  class="connection-line"
+                  stroke="var(--kendo-color-primary, #0078d4)"
+                  stroke-width="2"
+                  fill="none"
+                  marker-end="url(#arrowhead)"
+                />
+                <!-- Invisible wider path for easier clicking -->
+                <path
+                  [attr.d]="getConnectionPath(connection)"
+                  class="connection-hitarea"
+                  stroke="transparent"
+                  stroke-width="12"
+                  fill="none"
+                  (click)="deleteConnection(connection, $event)"
+                  [attr.aria-label]="'Delete connection. Click to remove.'"
+                  role="button"
+                  tabindex="0"
+                />
+              </g>
+            }
+          </svg>
+
           @if (canvasSteps().length === 0) {
             <div class="canvas-placeholder">
               <svg class="placeholder-icon" width="120" height="120" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -95,13 +147,22 @@
             <div 
               class="canvas-step"
               [class.selected]="selectedStep()?.id === canvasStep.id"
+              [class.connecting]="connectingFrom() && connectingFrom()?.id !== canvasStep.id"
+              [class.connecting-source]="connectingFrom()?.id === canvasStep.id"
               [style.left.px]="canvasStep.x - 75"
               [style.top.px]="canvasStep.y - 50"
-              (click)="selectCanvasStep(canvasStep)"
+              (click)="connectingFrom() ? completeConnection(canvasStep, $event) : selectCanvasStep(canvasStep)"
+              (mouseenter)="onStepMouseEnter(canvasStep)"
+              (mouseleave)="onStepMouseLeave()"
               role="button"
               tabindex="0"
               [attr.aria-label]="'Workflow step: ' + canvasStep.name + '. Click to select and edit properties.'"
             >
+              <!-- Connection indicator when in connecting mode -->
+              @if (connectingFrom() && connectingFrom()?.id !== canvasStep.id) {
+                <div class="connection-indicator" aria-hidden="true"></div>
+              }
+              
               <div class="canvas-step-header">
                 <kendo-svg-icon 
                   [icon]="canvasStep.svgIcon" 
@@ -109,15 +170,30 @@
                   [attr.aria-hidden]="true"
                 ></kendo-svg-icon>
                 <span class="canvas-step-name">{{ canvasStep.name }}</span>
-                <button 
-                  kendoButton 
-                  [icon]="'x'" 
-                  [fillMode]="'flat'"
-                  [size]="'small'"
-                  class="remove-btn"
-                  [attr.aria-label]="'Remove ' + canvasStep.name + ' from workflow'"
-                  (click)="removeCanvasStep(canvasStep); $event.stopPropagation()"
-                ></button>
+                
+                <!-- Action buttons -->
+                <div class="step-actions">
+                  <button 
+                    kendoButton 
+                    [icon]="'link-45'"
+                    [fillMode]="'flat'"
+                    [size]="'small'"
+                    class="connect-btn"
+                    [attr.aria-label]="'Connect ' + canvasStep.name + ' to another step'"
+                    (click)="startConnection(canvasStep, $event)"
+                    title="Connect to another step"
+                  ></button>
+                  <button 
+                    kendoButton 
+                    [icon]="'x'" 
+                    [fillMode]="'flat'"
+                    [size]="'small'"
+                    class="remove-btn"
+                    [attr.aria-label]="'Remove ' + canvasStep.name + ' from workflow'"
+                    (click)="removeCanvasStep(canvasStep); $event.stopPropagation()"
+                    title="Remove step"
+                  ></button>
+                </div>
               </div>
             </div>
           }
